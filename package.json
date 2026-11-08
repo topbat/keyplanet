@@ -1,0 +1,14 @@
+{
+  "name": "keyplanet",
+  "version": "0.1.0",
+  "description": "键盘星球 · A browser-based typing adventure for families",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

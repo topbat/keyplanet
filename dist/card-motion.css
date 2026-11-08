@@ -1,0 +1,118 @@
+/* Motion is a short response to interaction, not a continuous distraction. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card) {
+    transition: transform 260ms cubic-bezier(.2,.7,.2,1),
+      box-shadow 260ms ease, border-color 260ms ease;
+    transform-origin: center bottom;
+  }
+
+  html[data-motion="on"] :is(.game-art > span, .world-icon, .course-icon, .training-icon) {
+    display: inline-grid;
+    place-items: center;
+    transition: transform 360ms cubic-bezier(.2,.75,.25,1);
+  }
+
+  html[data-motion="on"] .game-art::after {
+    transition: transform 360ms ease, opacity 360ms ease;
+  }
+
+  html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card):focus-within {
+    transform: translateY(-4px);
+    border-color: #a8dcca;
+    box-shadow: 0 13px 28px #245d4924;
+  }
+
+  html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card):focus-within :is(.game-art > span, .world-icon, .course-icon, .training-icon) {
+    transform: translateY(-3px) scale(1.09);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card):hover {
+      transform: perspective(900px) translateY(-6px) rotateX(2deg);
+      border-color: #a8dcca;
+      box-shadow: 0 15px 30px #245d4928;
+    }
+
+    html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card):hover :is(.game-art > span, .world-icon, .course-icon, .training-icon) {
+      transform: translateY(-5px) scale(1.12) rotate(-4deg);
+    }
+
+    html[data-motion="on"] .game-card:hover .game-art::after {
+      transform: translate(-4px, 4px) rotate(35deg) scale(1.25);
+      opacity: .8;
+    }
+
+    html[data-motion="on"] :is(.game-card, .world, .course, .training-card, .lab-card):active {
+      transform: translateY(-2px) scale(.99);
+    }
+  }
+}
+
+/* A little illustrated stage for each game family. */
+.game-art { height: 136px; overflow: hidden; isolation: isolate; }
+.card-scenery { position: absolute; inset: 0; pointer-events: none; }
+.card-scenery::before { content: ''; position: absolute; width: 104px; height: 104px; border-radius: 50%; top: 7px; left: calc(50% - 52px); background: #ffffff4d; box-shadow: 0 0 0 18px #ffffff18; }
+.card-scenery::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--light-x,50%) var(--light-y,35%), #ffffff6b, transparent 56%); opacity: .6; }
+.card-subject { position: absolute; display: grid; place-items: center; z-index: 3; inset: 17px 0 27px; font-size: 49px; line-height: 1; filter: drop-shadow(0 8px 5px #365a4b28); transform-origin: center; }
+.card-orbit { position: absolute; z-index: 1; width: 112px; height: 37px; border: 1px solid #ffffffba; border-radius: 50%; left: calc(50% - 56px); top: 48px; transform: rotate(-13deg); }
+.card-path { position: absolute; z-index: 1; width: 145%; height: 33px; left: -22%; bottom: 8px; background: #ffffff63; border-radius: 50% 50% 0 0; transform: rotate(-4deg); box-shadow: 0 -7px 0 #ffffff27; }
+.card-spark { position: absolute; z-index: 4; color: #fff; font-size: 15px; font-style: normal; text-shadow: 0 2px 5px #b9864d40; }
+.card-spark-one { top: 22px; left: 22%; }
+.card-spark-two { top: 53px; right: 18%; font-size: 18px; }
+.game-art small { z-index: 5; }
+.game-card[data-scene="race"] .card-path { height: 30px; bottom: 10px; border-radius: 0; background: repeating-linear-gradient(90deg,#e5fff0a8 0 18px,#529c7c88 18px 37px); transform: rotate(-8deg); }
+.game-card[data-scene="race"] .card-orbit { width: 86px; height: 2px; border: 0; border-radius: 0; top: 62px; left: 13%; background: linear-gradient(90deg,transparent,#fff9,transparent); transform: rotate(-8deg); }
+.game-card[data-scene="slice"] .card-orbit { width: 82px; height: 82px; border: 2px dashed #ffffffa6; left: calc(50% - 41px); top: 16px; transform: rotate(-12deg); }
+.game-card[data-scene="target"] .card-orbit { width: 84px; height: 84px; left: calc(50% - 42px); top: 14px; border: 2px solid #ffffffb0; box-shadow: 0 0 0 10px #ffffff2e, 0 0 0 20px #ffffff22; }
+.game-card[data-scene="build"] .card-path { height: 24px; bottom: 8px; background: #b6e5c1bd; border-radius: 55% 55% 0 0; transform: none; }
+.game-card[data-scene="build"] .card-orbit { border-radius: 10px; width: 86px; height: 74px; left: calc(50% - 43px); top: 20px; transform: rotate(6deg); border: 2px dashed #fff9; }
+.game-card[data-scene="memory"] .card-orbit { width: 70px; height: 84px; top: 13px; left: calc(50% - 35px); border-radius: 14px; transform: rotate(-8deg); border: 2px solid #ffffffcf; box-shadow: 6px 6px 0 #ffffff42; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="on"] #courses.active-view .card-subject { animation: card-float 4.8s ease-in-out infinite; }
+  html[data-motion="on"] #courses.active-view .game-card:nth-child(3n + 2) .card-subject { animation-delay: -.9s; }
+  html[data-motion="on"] #courses.active-view .game-card:nth-child(3n) .card-subject { animation-delay: -1.8s; }
+  html[data-motion="on"] .card-scenery { transition: transform 350ms cubic-bezier(.2,.7,.2,1); }
+  html[data-motion="on"] .card-spark, html[data-motion="on"] .card-orbit, html[data-motion="on"] .card-path { transition: transform 420ms ease, opacity 420ms ease; }
+  html[data-motion="on"] .game-card:focus-within .card-scenery { transform: scale(1.06); }
+  html[data-motion="on"] .game-card:focus-within .card-subject { animation: card-float 1.8s ease-in-out infinite; }
+  html[data-motion="on"] .game-card:focus-within .card-orbit { opacity: .95; }
+  @media (hover: hover) and (pointer: fine) {
+    html[data-motion="on"] .game-card:hover { transform: perspective(850px) translateY(-8px) rotateX(var(--tilt-x,2deg)) rotateY(var(--tilt-y,0deg)); box-shadow: 0 20px 35px #245d4938; }
+    html[data-motion="on"] .game-card:hover .card-scenery { transform: scale(1.07) translate(var(--pointer-x,0px),var(--pointer-y,0px)); }
+    html[data-motion="on"] .game-card:hover .card-spark-one { transform: translate(-9px,-5px) scale(1.45) rotate(35deg); }
+    html[data-motion="on"] .game-card:hover .card-spark-two { transform: translate(8px,-8px) scale(1.35) rotate(-30deg); }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="race"]:hover .card-subject { animation: card-race 1s ease-in-out infinite; }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="race"]:hover .card-path { animation: card-road .55s linear infinite; }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="slice"]:hover .card-subject { animation: card-slice 1.15s ease-in-out infinite; }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="target"]:hover .card-orbit { animation: card-target 1.4s ease-in-out infinite; }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="build"]:hover .card-subject { animation: card-build 1.5s ease-in-out infinite; }
+    html[data-motion="on"] #courses.active-view .game-card[data-scene="memory"]:hover .card-orbit { animation: card-flip 1.8s ease-in-out infinite; }
+  }
+  @keyframes card-float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
+  @keyframes card-race { 0%,100% { transform: translate(-6px,2px) rotate(-4deg); } 50% { transform: translate(9px,-5px) rotate(5deg); } }
+  @keyframes card-road { from { background-position: 0 0; } to { background-position: -37px 0; } }
+  @keyframes card-slice { 0%,100% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-10px) rotate(12deg) scale(1.14); } }
+  @keyframes card-target { 0%,100% { transform: scale(.85); opacity: .65; } 50% { transform: scale(1.15); opacity: 1; } }
+  @keyframes card-build { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-12px) rotate(4deg) scale(1.08); } }
+  @keyframes card-flip { 0%,100% { transform: perspective(220px) rotateY(0) rotate(-8deg); } 50% { transform: perspective(220px) rotateY(180deg) rotate(8deg); } }
+}
+@media(max-width:760px){ .game-art{height:120px}.card-subject{font-size:43px} }
+
+/* Story worlds and training cards share the same gentle visual language. */
+.world::before { content: ''; position: absolute; right: -42px; bottom: -75px; width: 180px; height: 180px; border-radius: 50%; background: #ffffff45; box-shadow: 0 0 0 24px #ffffff24, 0 0 0 48px #ffffff17; pointer-events: none; }
+.world > * { position: relative; z-index: 1; }
+.training-card { position: relative; overflow: hidden; }
+.training-card::before { content: ''; position: absolute; right: -36px; top: -52px; width: 115px; height: 115px; border-radius: 50%; background: #eaf8f1; opacity: .65; pointer-events: none; }
+.training-card > * { position: relative; }
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="on"] .world::before, html[data-motion="on"] .training-card::before { transition: transform 520ms cubic-bezier(.2,.7,.2,1), opacity 520ms ease; }
+  html[data-motion="on"] :is(.world,.training-card):focus-within::before { transform: scale(1.22) translate(-5px,-5px); opacity: .9; }
+  @media (hover: hover) and (pointer: fine) {
+    html[data-motion="on"] :is(.world,.training-card):hover::before { transform: scale(1.25) translate(-7px,-7px); opacity: .95; }
+    html[data-motion="on"] .world:hover .world-icon { animation: world-arrive 1.5s ease-in-out infinite; }
+    html[data-motion="on"] .training-card:hover .training-icon { animation: key-hello 1.5s ease-in-out infinite; }
+  }
+  @keyframes world-arrive { 0%,100% { transform: translateY(-3px) rotate(-5deg); } 50% { transform: translateY(-10px) rotate(7deg) scale(1.12); } }
+  @keyframes key-hello { 0%,100% { transform: translateY(0) rotate(0); } 35% { transform: translateY(-6px) rotate(-7deg); } 70% { transform: translateY(-3px) rotate(5deg); } }
+}

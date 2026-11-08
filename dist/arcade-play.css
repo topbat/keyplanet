@@ -1,0 +1,167 @@
+.ap-shell{max-width:1020px;margin:0 auto;color:#23443f}.ap-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}.ap-name{display:flex;align-items:center;gap:14px}.ap-name h2{font-size:24px;line-height:1.25;margin:0 0 6px}.ap-name p{font-size:13px;color:#78958c;margin:0;line-height:1.6}.ap-icon{width:50px;height:50px;display:grid;place-items:center;background:#e5f7ed;border-radius:15px;font-size:27px;flex:none}.ap-stats{display:flex;align-items:center;flex-wrap:wrap;gap:10px 24px;padding:15px 19px;background:white;border:1px solid #e3eee9;border-radius:15px 15px 0 0;font-size:12px;color:#6a8b80}.ap-progress-label{font-weight:800;color:#277d68}.ap-clock{margin-left:auto;color:#ce7d33;white-space:nowrap}.ap-track{height:7px;background:#e2f1e9;overflow:hidden;border-radius:0 0 6px 6px}.ap-track-fill{height:100%;width:0;background:#39b98d;transition:width .25s}.ap-stage{margin-top:16px;padding:16px 16px 18px;border:1px solid #dcece3;border-radius:20px;background:#fff;outline:none}.ap-stage:focus-visible{outline:3px solid #efad4b;outline-offset:3px}.ap-scene{overflow:hidden;border-radius:14px}.ap-cue{font-size:23px;font-weight:800;text-align:center;color:#1d6857;padding:16px 5px 2px;overflow-wrap:anywhere}.ap-hint{text-align:center;color:#78958a;font-size:12px;margin:5px 0}.ap-live{min-height:1.4em;text-align:center;font-size:12px;color:#238a6e}.ap-controls,.ap-result-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.ap-button{border:1px solid #cde4da;border-radius:10px;padding:11px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}.ap-button:focus-visible{outline:3px solid #efad4b;outline-offset:3px}.ap-button:disabled{opacity:.55;cursor:not-allowed}.ap-primary{background:#199d7b;color:white;border-color:#199d7b}.ap-primary:hover{background:#138064}.ap-outline{color:#4b8273;background:white}.ap-outline:hover{background:#eff9f4}.ap-notes{font-size:11px;line-height:1.8;color:#91aaa0}.ap-result{padding:30px;background:#f1faf4;border:1px solid #d9efe1;border-radius:18px;text-align:center}.ap-result-stars{font-size:32px;letter-spacing:5px;color:#e9ad45}.ap-result h3{font-size:22px;margin:10px 0 20px}.ap-result p{font-size:13px;line-height:1.8;color:#638c7e}.ap-result-note{font-size:11px!important;color:#8da79b!important}.ap-result-actions{justify-content:center}.ap-shell [hidden]{display:none!important}@media(max-width:600px){.ap-top{align-items:flex-start}.ap-name h2{font-size:19px}.ap-name p{font-size:12px}.ap-icon{width:42px;height:42px}.ap-stats{gap:8px 15px}.ap-clock{margin-left:0}.ap-cue{font-size:19px}.ap-stage{padding:10px}.ap-controls .ap-button{flex:1}.ap-controls .ap-primary{min-width:100%}}
+
+.ap-combo {
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: #edf7f1;
+  color: #296b59;
+  font-weight: 800;
+}
+.ap-combo-powered { background: #ffe9aa; color: #754914; }
+.ap-live[data-outcome="miss"],
+.ap-live[data-outcome="timeout"] { color: #925124; }
+.ap-result { margin-top: 16px; }
+
+.arcade-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 76% 18%, #fff6b1 0%, #ffdaac61 28%, transparent 67%);
+  opacity: 0;
+  pointer-events: none;
+}
+.arcade-scene[data-stage="1"]::before { opacity: .38; }
+.arcade-scene[data-stage="2"]::before { opacity: .64; }
+.arcade-scene[data-stage="3"]::before,
+.arcade-scene[data-stage="4"]::before { opacity: .86; }
+.arcade-scene[data-stage="4"] { border-color: #e2bf67; }
+.arcade-scene [hidden] { display: none; }
+.arcade-impact { display: none; }
+html[data-motion="off"] .arcade-scene *,
+html[data-motion="off"] .ap-track-fill {
+  animation: none !important;
+  transition: none !important;
+}
+html[data-motion="off"] .kp-celebration { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-track-fill { transition: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="on"] .arcade-scene::before { transition: opacity 520ms ease; }
+  html[data-motion="on"] .scene-race.ap-boost .race-lanes {
+    border: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, #fff2a6 0 27px, transparent 27px 54px);
+    animation: race-rush .34s linear infinite;
+  }
+  html[data-motion="on"] .scene-memory.feedback-hidden .memory-card {
+    transform: perspective(250px) rotateY(-24deg) scale(.94);
+  }
+  html[data-motion="on"] .arcade-impact {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .impact-event { position: absolute; inset: 0; animation: impact-fade .54s ease-out both; }
+  .impact-powered { animation-duration: .72s; }
+  .impact-sparks {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    color: #fff4bd;
+    font-size: 28px;
+    letter-spacing: .38em;
+    text-shadow: 0 1px 10px #986837a0;
+    white-space: nowrap;
+    animation: sparks-rise .52s ease-out both;
+  }
+  .impact-powered .impact-sparks { color: #ffdf75; font-size: 36px; }
+  .scene-race .impact-sparks { left: calc(5% + var(--arcade-progress) * 73%); top: auto; bottom: 65px; }
+  .scene-target .impact-sparks { left: auto; right: 18%; top: 28%; }
+  .scene-target .impact-hit::before {
+    content: '';
+    position: absolute;
+    right: calc(21% - 12px);
+    top: calc(32% - 12px);
+    width: 124px;
+    height: 124px;
+    border: 4px solid #fff3ae;
+    border-radius: 50%;
+    animation: star-ring .48s ease-out both;
+  }
+  .impact-fruit {
+    position: absolute;
+    top: calc(48% - 65px);
+    left: 50%;
+    font-size: 92px;
+    line-height: 1;
+    animation: fruit-flight .46s ease-out both;
+  }
+  .impact-fruit-left { clip-path: inset(0 50% 0 0); --slice-drift: -40px; --slice-turn: -22deg; }
+  .impact-fruit-right { clip-path: inset(0 0 0 50%); --slice-drift: 40px; --slice-turn: 22deg; }
+  .scene-slice .impact-hit::after {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 42%;
+    width: 16%;
+    height: 4px;
+    border-radius: 6px;
+    background: #fff6d4;
+    box-shadow: 0 0 13px #fff3bf;
+    transform: rotate(-40deg);
+    animation: slash-sweep .25s ease-out both;
+  }
+  .impact-miss, .impact-timeout { box-shadow: inset 0 0 30px #a75f2850; }
+  .impact-skip { box-shadow: inset 0 0 30px #6d8db042; }
+  .impact-finish {
+    background: radial-gradient(ellipse at center, #fff1a565, transparent 75%);
+    animation-duration: 1.35s;
+  }
+  .arcade-scene .impact-finish .impact-sparks {
+    left: 50%;
+    right: auto;
+    top: 37%;
+    bottom: auto;
+    font-size: 48px;
+    animation-duration: 1.2s;
+  }
+
+  @keyframes race-rush { to { background-position: -54px 0; } }
+  @keyframes impact-fade { 0%, 28% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes sparks-rise {
+    from { transform: translate(-50%, 12px) scale(.72); }
+    to { transform: translate(-50%, -34px) scale(1.16); }
+  }
+  @keyframes star-ring { from { scale: .78; } to { scale: 1.38; opacity: 0; } }
+  @keyframes fruit-flight {
+    from { transform: translate(-50%, 0); }
+    to { transform: translate(calc(-50% + var(--slice-drift)), -23px) rotate(var(--slice-turn)); opacity: 0; }
+  }
+  @keyframes slash-sweep { from { scale: .2 1; } to { scale: 1.3 1; opacity: 0; } }
+}
+
+.arcade-chapters {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 11px;
+  background: #23394548;
+}
+.arcade-chapters span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  color: #fff9;
+  background: #263f4c31;
+  font-size: 13px;
+}
+.arcade-chapters .chapter-earned {
+  background: #ffdf8e;
+  color: #624218;
+  box-shadow: 0 0 12px #ffe8a3a8;
+}
+@media (max-width: 480px) {
+  .scene-memory .arcade-chapters { bottom: 3px; }
+  .scene-memory .memory-bottom { bottom: 40px; }
+}

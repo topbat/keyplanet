@@ -1,0 +1,7 @@
+export const adventures = {
+ journey:{name:'云间奇遇',icon:'☁️',tag:'神话冒险',color:'journey',description:'翻过云山，和小伙伴一起寻找散落的星光。',episodes:[{title:'第一站 · 花果山来信',story:'山间的小猴收到一封飞来的信。信上的星光正在消失，需要你用文字帮它点亮。',target:'花果山的风，带来了远方的故事。'},{title:'第二站 · 云桥寻星',story:'云桥前有一盏小灯。跟着文字走过云桥，就能把迷路的星星送回天空。',target:'穿过云朵，我们一起寻找星星。'},{title:'第三站 · 好朋友同行',story:'旅途很长，好朋友们决定互相帮助，继续向前。',target:'勇敢出发，朋友会一直陪伴你。'}]},
+ seasons:{name:'四季邮局',icon:'🌿',tag:'自然风景',color:'seasons',description:'收集四季的问候，把美丽风景寄给远方。',episodes:[{title:'第一站 · 春天的信',story:'春风把一封信轻轻送到了你的窗前，快帮邮差把它寄出去吧。',target:'春天来了，花儿在微风里摇摆。'},{title:'第二站 · 夏日来信',story:'池塘边的荷叶收到了夏天的邀请，文字里藏着一片清凉。',target:'夏日的荷叶上，落着一滴露珠。'},{title:'第三站 · 秋冬收藏',story:'把秋天的落叶和冬天的雪花，一起装进记忆的信封。',target:'秋叶轻轻落下，冬雪慢慢飘来。'}]},
+ animals:{name:'动物森林',icon:'🦊',tag:'温暖伙伴',color:'animals',description:'帮助森林里的小动物，完成一个个温柔任务。',episodes:[{title:'第一站 · 小狐狸迷路了',story:'小狐狸找不到回家的路。完成这句提示，为它点亮森林里的路标。',target:'小狐狸沿着明亮的小路回家。'},{title:'第二站 · 小熊的果篮',story:'小熊正在为朋友准备水果。帮它写好邀请，让大家一起来分享。',target:'小熊邀请朋友们分享甜甜的果子。'},{title:'第三站 · 森林音乐会',story:'森林里要开音乐会啦，小兔、小鹿和小鸟都准备好了。',target:'小鸟唱起歌，森林里充满欢笑。'}]}
+};
+export function progressFor(target,value){const chars=Array.from(target),typed=Array.from(value);let correctPrefix=0;while(correctPrefix<chars.length && chars[correctPrefix]===typed[correctPrefix])correctPrefix++;return {correctPrefix,total:chars.length,percent:chars.length?Math.round(correctPrefix/chars.length*100):0}}
+export function starsFor(accuracy){return accuracy>=95?3:accuracy>=80?2:accuracy>=50?1:0}

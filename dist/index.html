@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f9fb"><title>键盘星球 | 家庭打字冒险</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./celebration.css">
+  <link rel="stylesheet" href="./arcade-scenes.css">
+  <link rel="stylesheet" href="./arcade-play.css">
+  <link rel="stylesheet" href="./card-motion.css">
+  <link rel="stylesheet" href="./growth-dashboard.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="brand" href="#home" data-go="home" aria-label="键盘星球首页"><span class="brand-icon">✳</span><span>键盘星球<small>KEYPLANET</small></span></a>
+    <div class="side-label">我的冒险</div>
+    <nav aria-label="主导航">
+      <button class="nav active" data-view="home"><span>⌂</span> 冒险首页</button>
+      <button class="nav" data-view="courses"><span>▦</span> 练习地图</button>
+      <button class="nav" data-view="keylab"><span>⌨</span> 键盘训练营</button>
+      <button class="nav" data-view="records"><span>◷</span> 成长记录</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="mini-planet">✦</div><strong>一点点，就很了不起</strong><p>每天练习一会儿，<br>让手指越来越灵活。</p></div>
+  </aside>
+  <main>
+    <header class="topbar"><div><span class="breadcrumb">我的冒险</span><span class="slash"> / </span><strong id="page-name">冒险首页</strong></div><div class="top-right"><span class="device-hint">⌨ 建议使用实体键盘</span><button class="quiet" id="sound-toggle" aria-pressed="false">音效：关</button><button class="quiet" id="motion-toggle" aria-pressed="false">动态效果：开</button><span class="avatar">✦</span></div></header>
+    <div class="content">
+      <section id="home" class="view active-view">
+        <div class="welcome"><div><div class="eyebrow"><span></span> 今天也来探索吧</div><h1>嗨，小小探险家！</h1><p>准备好了吗？让我们一起开启今天的打字冒险。</p></div><div class="date" id="today"></div></div>
+        <div class="hero">
+          <div class="hero-copy"><div class="hero-kicker"><span>✦</span> 你的打字冒险，从这里开始</div><h2>每敲下一键<br>都在点亮新世界<span>。</span></h2><p>从认识键盘，到自在表达。<br>跟着自己的节奏，慢慢成为打字小高手。</p><button class="primary" data-start="keyboard">开始今天的练习 <span>↗</span></button><div class="hero-note">✧ &nbsp;不用着急，每一步都算数</div></div>
+          <canvas id="planet" aria-label="旋转的立体星球插画" role="img"></canvas><div class="orbit-label"><span>✦</span><div><strong>下一站</strong><small>更灵活的手指</small></div></div>
+        </div>
+        <div class="section-heading story-heading"><div><div class="section-overline">STORY WORLDS</div><h2>今天，去哪个世界冒险？</h2><p>输入文字推进故事，完成挑战收集星星。</p></div></div>
+        <div class="world-grid" id="worlds"></div>
+        <div class="quest-banner"><div class="quest-icon">⌨</div><div><strong>键盘训练营</strong><p>从认识按键到独立考核，和键盘成为好朋友。</p></div><button class="outline" data-go="keylab">出发训练 →</button></div>
+        <div class="section-heading"><div><div class="section-overline">CHOOSE YOUR PATH</div><h2>选择你的练习路线</h2><p>找到喜欢的方式，开始自己的冒险。</p></div><button class="text-button" data-go="courses">查看全部路线 <span>→</span></button></div>
+        <div class="course-grid" id="home-courses"></div>
+        <div class="bottom-grid"><section class="progress-card"><div class="section-overline">YOUR LITTLE STEPS</div><h3>每一次练习，都值得被看见</h3><div class="stats"><div><strong id="total-sessions">0</strong><span>次完成练习</span></div><div><strong id="avg-accuracy">--</strong><span>平均完成准确率</span></div><div><strong id="last-route">--</strong><span>最近练习路线</span></div></div><button class="text-button" data-go="records">看看我的成长记录 →</button></section><section class="tip-card"><div class="tip-icon">✦</div><div><strong>给探险家的小提示</strong><p>坐姿放轻松，先打准确，再慢慢加快。练习一会儿，记得休息一下眼睛和手指。</p></div></section></div>
+      </section>
+      <section id="courses" class="view"><div class="page-intro arcade-intro"><div class="section-overline">ARCADE WORLDS</div><h1>游戏冒险地图</h1><p>选一个喜欢的世界，在游戏里练键盘。所有主题都可以自由选择。</p></div><div id="game-gallery"></div><div class="section-heading"><div><div class="section-overline">TYPING PATHS</div><h2>输入法练习路线</h2><p>继续练习拼音、五笔和基础打字。</p></div></div><div class="course-grid" id="all-courses"></div><div class="notice">✦ &nbsp; 拼音路线使用电脑上已安装的中文输入法；五笔路线先练习 86 版常用字的编码。</div></section>
+      <section id="keylab" class="view"><div class="page-intro"><div class="section-overline">KEYBOARD CAMP</div><h1>键盘训练营</h1><p>看清提示，找到对应按键。可以先练习，再挑战独立考核。</p></div><div id="keylab-content"></div></section>
+      <section id="arcade" class="view"><div id="arcade-mount"></div></section>
+      <section id="records" class="view">
+        <div class="page-intro"><div class="section-overline">GROW AT YOUR PACE</div><h1>成长记录</h1><p>每一次练习，都会在你的成长轨迹上留下一颗星。</p></div>
+        <div id="growth-dashboard"></div>
+        <div id="coach-panel" class="coach-panel"></div>
+        <div class="growth-storage"><p>练习成绩保存在当前浏览器中。</p><button class="outline" id="clear-records">清空记录</button></div>
+      </section>
+      <section id="practice" class="view"><button class="back" data-go="courses">← 返回练习地图</button><div class="practice-layout"><div class="practice-main"><div class="practice-heading"><div><div class="section-overline" id="practice-route"></div><h1 id="practice-title"></h1><p id="practice-instruction"></p></div><span class="level-pill" id="level-pill"></span></div><div class="story-intro hidden" id="story-intro"></div><div class="practice-box"><div class="exercise-top"><span>照着下面的内容输入</span><span id="timer">00:00</span></div><div class="target" id="target"></div><div class="mission-progress hidden" id="mission-progress"><div><span>点亮故事</span><strong id="progress-label">0%</strong></div><div class="progress-track"><div id="progress-fill"></div></div></div><label for="typing">在这里输入</label><textarea id="typing" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="点击这里，开始输入…"></textarea><div class="practice-actions"><span id="input-hint">从第一次输入开始计时</span><button class="primary" id="finish">完成练习 <span>↗</span></button></div></div><div class="result hidden" id="result" aria-live="polite"></div></div><aside class="practice-aside"><div class="compass">✳</div><h3>慢慢来，你可以的！</h3><p>看清楚题目，用舒服的节奏输入。打错了可以修改，完成后再提交。</p><div class="aside-rule"></div><strong>练习小贴士</strong><p>双脚放稳，手腕放松。每练习一段时间，记得休息。</p></aside></div></section>
+      <footer>键盘星球 <span>✦</span> 让每一次练习，都成为新的发现 <span>·</span> 家庭体验版</footer>
+    </div>
+  </main>
+</div>
+<script type="module" src="./app.js"></script>
+</body></html>

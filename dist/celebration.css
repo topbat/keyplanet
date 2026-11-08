@@ -1,0 +1,31 @@
+.kp-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.kp-confetti {
+  position: absolute;
+  top: -20px;
+  left: var(--kp-x);
+  width: 9px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--kp-color);
+  opacity: 0;
+  animation: kp-confetti-fall var(--kp-duration) ease-in var(--kp-delay) forwards;
+}
+
+.kp-confetti-round { width: 9px; height: 9px; border-radius: 50%; }
+
+@keyframes kp-confetti-fall {
+  0% { opacity: 1; transform: translate3d(0, -20px, 0) rotate(0deg); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--kp-drift), 105vh, 0) rotate(var(--kp-rotation)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-celebration { display: none; }
+}
