@@ -9,9 +9,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-release-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
 jobs:
   test:
-    name: Test frontend
+    name: Test and validate release notes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -20,19 +24,76 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '22'
+          package-manager-cache: false
       - run: npm test
-      - name: Check frontend entry point and syntax
+      - name: Check entry points and syntax
         run: |
           test -s dist/index.html
-          for file in dist/*.js; do node --check "$file"; done
+          for file in dist/*.js desktop/*.cjs scripts/*.mjs; do node --check "$file"; done
+      - name: Validate Chinese changelog
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          node scripts/release-notes.mjs "$version"
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            test "$GITHUB_REF_NAME" = "v$version"
+          fi
 
-  release:
-    name: Publish static web release
-    if: github.event_name == 'push' && github.ref_type == 'tag'
-    needs: test
+  security:
+    name: Scan dependencies, Git history and workflows
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Audit the lockfile
+        run: npm audit --audit-level=moderate
+      - name: Scan Git history for exposed secrets
+        run: |
+          curl --fail --silent --show-error --location --retry 3 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$RUNNER_TEMP/gitleaks.tar.gz"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git --redact --no-banner --log-opts='HEAD' .
+      - uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        with:
+          version: v1.32.0
+          inputs: .github/workflows
+          persona: auditor
+          online-audits: false
+          advanced-security: false
+          annotations: true
+
+  desktop:
+    name: Build and verify ${{ matrix.target }}
+    if: github.event_name == 'push'
+    needs: [test, security]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            runner: windows-2025
+            platform: win
+            arch: x64
+            suffix: windows-x64-setup.exe
+          - target: macos-x64
+            runner: macos-15-intel
+            platform: mac
+            arch: x64
+            suffix: macos-x64.dmg
+          - target: macos-arm64
+            runner: macos-15
+            platform: mac
+            arch: arm64
+            suffix: macos-arm64.dmg
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -40,18 +101,94 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '22'
-      - name: Package and verify web assets
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts
+      - name: Build installer
+        env:
+          BUILD_PLATFORM: ${{ matrix.platform }}
+          BUILD_ARCH: ${{ matrix.arch }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        shell: bash
+        run: npm run package:desktop -- "--$BUILD_PLATFORM" "--$BUILD_ARCH"
+      - name: Install and launch on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          test "$GITHUB_REF_NAME" = "v$(node -p 'require("./package.json").version')"
+          $version = node -p 'require("./package.json").version'
+          $setup = "release/keyplanet-v$version-windows-x64-setup.exe"
+          $installDir = Join-Path $env:RUNNER_TEMP 'KeyPlanet'
+          $installer = Start-Process -FilePath $setup -ArgumentList '/S', "/D=$installDir" -PassThru -Wait -WindowStyle Hidden
+          if ($installer.ExitCode -ne 0) { throw "Installer exited with $($installer.ExitCode)" }
+          $game = Start-Process -FilePath (Join-Path $installDir 'KeyPlanet.exe') -ArgumentList '--smoke-test' -PassThru -WindowStyle Hidden
+          if (-not $game.WaitForExit(60000)) {
+            Stop-Process -Id $game.Id -Force
+            throw 'Desktop smoke test timed out'
+          }
+          if ($game.ExitCode -ne 0) { throw "Desktop smoke test exited with $($game.ExitCode)" }
+      - name: Mount and launch on macOS
+        if: runner.os == 'macOS'
+        env:
+          BUILD_ARCH: ${{ matrix.arch }}
+        shell: bash
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          asset="release/keyplanet-v$version-macos-$BUILD_ARCH.dmg"
+          mount=$(mktemp -d "$RUNNER_TEMP/keyplanet.XXXXXX")
+          hdiutil verify "$asset"
+          hdiutil attach -readonly -nobrowse -mountpoint "$mount" "$asset"
+          trap 'hdiutil detach "$mount"' EXIT
+          app="$mount/KeyPlanet.app"
+          binary="$app/Contents/MacOS/KeyPlanet"
+          expected_arch=$BUILD_ARCH
+          if [[ "$expected_arch" == x64 ]]; then expected_arch=x86_64; fi
+          test "$(lipo -archs "$binary")" = "$expected_arch"
+          codesign --verify --deep --strict "$app"
+          "$binary" --smoke-test
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ${{ matrix.target }}
+          path: release/keyplanet-v*-${{ matrix.suffix }}
+          if-no-files-found: error
+          compression-level: 0
+
+  release:
+    name: Publish web and desktop release
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: [test, security, desktop]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Create the GitHub Release and upload its assets.
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          path: release
+          merge-multiple: true
+      - name: Prepare Chinese notes and verify assets
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          node scripts/release-notes.mjs "$version" > "$RUNNER_TEMP/release-notes.md"
           asset="keyplanet-${GITHUB_REF_NAME}-web.zip"
-          python3 -m zipfile -c "$asset" dist LICENSE NOTICE
-          python3 -m zipfile -t "$asset"
+          python3 -m zipfile -c "release/$asset" dist CHANGELOG.md LICENSE NOTICE
+          python3 -m zipfile -t "release/$asset"
+          cd release
           sha256sum "$asset" > "$asset.sha256"
-          sha256sum --check "$asset.sha256"
+          sha256sum "$asset" "keyplanet-${GITHUB_REF_NAME}-windows-x64-setup.exe" \
+            "keyplanet-${GITHUB_REF_NAME}-macos-x64.dmg" "keyplanet-${GITHUB_REF_NAME}-macos-arm64.dmg" > SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           asset="keyplanet-${GITHUB_REF_NAME}-web.zip"
-          gh release create "$GITHUB_REF_NAME" "$asset" "$asset.sha256" \
-            --verify-tag --title "KeyPlanet $GITHUB_REF_NAME" --generate-notes
+          gh release create "$GITHUB_REF_NAME" "release/$asset" "release/$asset.sha256" \
+            "release/keyplanet-${GITHUB_REF_NAME}-windows-x64-setup.exe" \
+            "release/keyplanet-${GITHUB_REF_NAME}-macos-x64.dmg" \
+            "release/keyplanet-${GITHUB_REF_NAME}-macos-arm64.dmg" release/SHA256SUMS.txt \
+            --verify-tag --title "键盘星球 $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md"

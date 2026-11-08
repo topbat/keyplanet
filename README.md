@@ -38,28 +38,51 @@ python -m http.server 8080 --bind 127.0.0.1 --directory dist
 
 ### 运行测试
 
-准备 Node.js 22 或更新版本。项目没有 npm 依赖，可直接在仓库根目录运行。
+准备 Node.js 22.12 或更新版本。网页版和单元测试可直接运行。桌面开发和打包依赖 Electron。
 
 ```bash
 npm test
 ```
 
-### 使用发布包
+### 安装桌面版或下载网页版
 
-从 [GitHub Releases](https://github.com/topbat/keyplanet/releases/latest) 下载 `keyplanet-v<版本>-web.zip`。解压后在包的根目录运行同一条 HTTP 服务命令，也可以将 `dist/` 中的文件部署到任意静态站点。Release 同时提供对应的 `.sha256` 校验文件。
+从 [GitHub Releases](https://github.com/topbat/keyplanet/releases/latest) 按设备选择下载文件。
+
+| 平台 | 文件后缀 | 安装方式 |
+| --- | --- | --- |
+| Windows 64 位 | `windows-x64-setup.exe` | 运行安装程序。 |
+| macOS Apple 芯片 | `macos-arm64.dmg` | 打开磁盘映像，将 KeyPlanet 拖入「应用程序」。 |
+| macOS Intel 芯片 | `macos-x64.dmg` | 打开磁盘映像，将 KeyPlanet 拖入「应用程序」。 |
+| 网页版 | `web.zip` | 解压后从包根目录运行上面的 HTTP 服务命令，或将 `dist/` 部署到静态站点。 |
+
+在 Mac 上可通过「关于本机」查看芯片类型。Windows 安装包未签名，macOS 应用采用临时签名且未经 Apple 公证，首次打开时系统可能提示确认。桌面版支持离线使用，练习记录保存在本机应用内。各下载文件的校验值见同一版本中的 `SHA256SUMS.txt`。
+
+### 本地运行桌面版
+
+```bash
+npm ci
+npm exec -- install-electron
+npm run desktop
+```
+
+在 Windows 上运行 `npm run package:desktop -- --win --x64` 可生成安装程序。在 macOS 上运行 `npm run package:desktop -- --mac --x64 --arm64` 可生成两种磁盘映像。输出目录为 `release/`。
 
 ## 项目结构
 
 | 路径 | 用途 |
 | --- | --- |
 | `dist/` | 页面、样式、游戏、评分逻辑和成长图表 |
-| `tests/` | 使用 Node.js 内置测试框架的练习与评分测试 |
+| `desktop/` | Electron 桌面入口和本地资源协议 |
+| `tests/` | 使用 Node.js 内置测试框架运行的测试 |
+| `CHANGELOG.md` | [中文修改历史](CHANGELOG.md) |
 | `docs/` | [玩法调研](docs/game-research.md)、[练习反馈设计](docs/ai-workflow.md)及项目截图 |
 | `.github/workflows/` | GitHub Actions 测试、打包和发布流程 |
 
 ## 持续集成与发布
 
-向 `main` 推送或提交拉取请求时，GitHub Actions 会运行测试并检查前端脚本语法。发布时，将 `package.json` 的 `version` 更新为目标版本，提交后推送对应的 `v<版本>` 标签。测试通过后，工作流会创建 GitHub Release，并附上静态网页 ZIP 和 SHA-256 校验文件。
+向 `main` 推送或提交拉取请求时，GitHub Actions 会运行测试、检查脚本语法和中文修改历史，并扫描依赖漏洞、Git 历史中的密钥和 Actions 工作流配置。推送到 `main` 时还会构建并启动验证三个桌面安装包。
+
+发布前，同步更新 `package.json` 和 `package-lock.json` 的版本，并在 [修改历史](CHANGELOG.md) 添加 `## [版本号] - YYYY-MM-DD` 章节及中文条目。将这些改动提交到 `main`，等待 CI 通过后推送对应的 `v<版本号>` 标签。标签触发测试、扫描与原生构建，全部通过后自动创建 GitHub Release。正文使用该版本的中文修改历史，附件包括网页 ZIP、三个桌面安装包及 SHA-256 校验文件。
 
 ## 参与贡献
 

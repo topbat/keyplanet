@@ -1,14 +1,41 @@
 {
   "name": "keyplanet",
-  "version": "0.1.0",
-  "description": "键盘星球 · A browser-based typing adventure for families",
+  "version": "0.2.0",
+  "description": "键盘星球 · 面向家庭和初学者的中文打字游戏",
   "private": true,
   "type": "module",
+  "main": "desktop/main.cjs",
+  "author": "KeyPlanet contributors",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "desktop": "electron .",
+    "package:desktop": "electron-builder --publish never"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0"
+  },
+  "overrides": {
+    "minimatch@>=7.0.0 <11.0.1": "11.0.1"
+  },
+  "build": {
+    "appId": "io.github.topbat.keyplanet",
+    "productName": "KeyPlanet",
+    "directories": { "output": "release" },
+    "files": ["desktop/*.cjs", "dist/**/*", "LICENSE", "NOTICE"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "artifactName": "keyplanet-v${version}-windows-${arch}-setup.${ext}"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "artifactName": "keyplanet-v${version}-macos-${arch}.${ext}",
+      "identity": "-",
+      "notarize": false
+    }
   }
 }
